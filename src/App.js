@@ -12,10 +12,9 @@ class App extends Component {
     super();
     this.state = null;
 
-    this.points = [ new Point(50,400), 
-                    new Point(200,700), 
+    this.points = [ new Point(0,400), 
                     new Point(400,200),
-                    new Point(700,500)];
+                    new Point(650,400)];
   }
 
   render() {
@@ -27,7 +26,7 @@ class App extends Component {
           <h1 className="App-title">Welcome to React for SplineCOMB</h1>
         </header>
         <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
+          Click in SVG to add a knot on the curve.
         </p>
 
         <SvgCubicSpline points={this.points}/>
