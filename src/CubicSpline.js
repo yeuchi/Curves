@@ -117,7 +117,11 @@ class CubicSpline
         }
         else 
         {
-            var index = this.bisection(point.x);
+            /*
+             * consider points prior to start 
+             * and points after end
+             */
+            var index = this.bisection(point.x) + 1;
             this.arySrcX.splice(index, 0, point.x);
             this.arySrcY.splice(index, 0, point.y);
             return true;

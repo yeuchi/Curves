@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
+import Point from './Point';
 import CubicSpline from './CubicSpline';
 
 class SvgCubicSpline extends Component {
     constructor(props)
     {
         super();
+        this.state = null;
         this.pointRadius = 1;
         this.points = props.points;
 
         this.spline = new CubicSpline();
         this.spline.setKnotsFromPoints(this.points);
+
+        //this.clickHandler = this.clickHandler.bind(this);
     }
 
     createDot(x)
@@ -17,6 +21,28 @@ class SvgCubicSpline extends Component {
         var y = this.spline.interpolateY(x);
         return (<circle id="point" cx={x} cy={y} r={this.pointRadius} />);
     }
+
+    getSvgBound()
+    {
+        this.svg = document.getElementById('idSvg');
+        if(null!=this.svg)
+            this.svgBound = this.svg.getBoundingClientRect();
+    }
+
+    clickHandler(e)
+    {
+        if(typeof(this.svg)==="undefined")
+            this.getSvgBound();
+
+        if(typeof(this.svgBound)=="undefined")
+            return;
+
+        var pos = new Point(e.clientX-this.svgBound.left, e.clientY-this.svgBound.top);
+        this.spline.append(pos);
+        // need to re-render !
+        
+        this.forceUpdate();
+      }
 
     /*
      * get SVG path elements that make up spline
@@ -44,8 +70,8 @@ class SvgCubicSpline extends Component {
 
     render() {
         return (
-        <svg id="idSvg" width="800" height="800">
-            <g stroke="black" stroke-width="3" fill="black">
+        <svg id="idSvg" width="800" height="800" onClick={this.clickHandler.bind(this)}>
+            <g stroke="black" strokeWidth="1" fill="black">
             {this.getElements()}
             </g>
         </svg>);

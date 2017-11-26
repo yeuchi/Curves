@@ -6,12 +6,20 @@ import Point from './Point';
 import SvgCubicSpline from './SvgCubicSpline';
 
 class App extends Component {
+
+  constructor()
+  {
+    super();
+    this.state = null;
+
+    this.points = [ new Point(50,400), 
+                    new Point(200,700), 
+                    new Point(400,200),
+                    new Point(700,500)];
+  }
+
   render() {
 
-    var points = [ new Point(50,400), 
-                  new Point(200,700), 
-                  new Point(400,200),
-                  new Point(700,500)];
     return (
       <div className="App">
         <header className="App-header">
@@ -22,7 +30,7 @@ class App extends Component {
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
 
-        <SvgCubicSpline points={points}/>
+        <SvgCubicSpline points={this.points}/>
       </div>
     );
   }
