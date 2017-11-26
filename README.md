@@ -12,6 +12,8 @@ Click anywhere in the SVG to append knots.
 
 ## Example
 
+![screen shot 2017-11-26 at 5 16 37 pm](https://user-images.githubusercontent.com/1282659/33245838-d04bed8a-d2d2-11e7-833b-b71ff6c3b28e.png)
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
