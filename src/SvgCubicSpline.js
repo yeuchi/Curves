@@ -15,17 +15,6 @@ class SvgCubicSpline extends Component {
         //this.clickHandler = this.clickHandler.bind(this);
     }
 
-    createLine(x0, x1)
-    {
-
-    }
-
-    createDot(x, radius)
-    {
-        var y = this.spline.interpolateY(x);
-        return (<circle id="point" cx={x} cy={y} r={radius} />);
-    }
-
     getSvgBound()
     {
         this.svg = document.getElementById('idSvg');
@@ -38,7 +27,7 @@ class SvgCubicSpline extends Component {
         if(typeof(this.svg)==="undefined")
             this.getSvgBound();
 
-        if(typeof(this.svgBound)=="undefined")
+        if(typeof(this.svgBound)==="undefined")
             return;
 
         var pos = new Point(e.clientX-this.svgBound.left, e.clientY-this.svgBound.top);
@@ -62,23 +51,98 @@ class SvgCubicSpline extends Component {
         var maxX = this.spline.maxX;
         this.spline.formulate();
 
-        // create a dot for every x position
-        this.dots2Draw = [];        
-        for(var x=minX; x<maxX; x++)
-            this.dots2Draw.push(this.createDot(x, 1));
+        this.createDots(minX, maxX);
+        this.createKnots(minX, maxX);
+        this.createLines(minX, maxX);
+    }
 
-        // create knot elements
+    createKnots(minX, maxX)
+    {
+        // create a dot for each knot 
         this.knots2Draw = [];
-        var radius = 3;
         for(var i=0; i<this.spline.arySrcX.length; i++)
         {
             var x = this.spline.arySrcX[i];
             var y = this.spline.arySrcY[i];
-            this.knots2Draw.push(<circle id="point" cx={x} cy={y} r={radius} />)
+            this.knots2Draw.push(this.createDot(x, y, 3));
         }
     }
 
-    getCurveDots()
+    createDots(minX, maxX)
+    {
+        // create a dot for every x position
+        this.dots2Draw = [];        
+        this.curveY = [];
+        for(var x=minX; x<maxX; x++)
+        {
+            var y = this.spline.interpolateY(x);
+           // this.dots2Draw.push(this.createDot(x, y, 1));
+            this.curveY.push(y);
+        }
+    }
+
+    createDot(x, y, radius)
+    {
+        return (<circle id="point" cx={x} cy={y} r={radius} />);
+    }
+
+    slopeRMS(slope0, slope1)
+    {
+        var s = slope1 - slope0;
+        var rms = Math.sqrt(s*s);
+        return rms;
+    }
+
+    createLines(minX, maxX)
+    {
+        // draw lines - can be optimized 
+        var slope0 = null;
+        var p0 = null;
+        var p1 = null;
+        this.lines2Draw = [];
+        var len = this.curveY.length-1;
+        for(var i=0; i<len; i++)
+        {
+            // calculate slope
+            var slope1 = (this.curveY[i+1]-this.curveY[i]);
+            p1 = new Point(i+minX, this.curveY[i]);
+            
+            if(null===slope0)
+            {
+                // new line
+                p0 = p1;
+                slope0 = slope1;
+            }
+            else
+            {
+                // when slope changes
+                if(this.slopeRMS(slope0, slope1)>0.1)
+                {
+                    this.lines2Draw.push(this.createLine(p0, p1));
+                    this.dots2Draw.push(this.createDot(p1.x, p1.y, 2));
+                    
+                    slope0 = null;
+                    p0 = null;
+                }
+            }
+        }
+        // last line segment
+        this.lines2Draw.push(this.createLine(p0, new Point(maxX, this.curveY[len])));
+    }
+
+    createLine(p0, p1)
+    {
+        return (<line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y}/>);
+    }
+
+    getLines()
+    {
+        return (<g stroke="green" strokeWidth="1">
+                {this.lines2Draw}
+                </g>);
+    }
+
+    getLineDots()
     {
         return (<g stroke="black" strokeWidth="0" fill="black">
                 {this.dots2Draw}
@@ -97,7 +161,8 @@ class SvgCubicSpline extends Component {
         
         return (
         <svg id="idSvg" width="800" height="800" onClick={this.clickHandler.bind(this)}>
-            {this.getCurveDots()}
+            {this.getLines()}        
+            {this.getLineDots()}
             {this.getCurveKnots()}
         </svg>);
     }
