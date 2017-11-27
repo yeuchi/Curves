@@ -51,9 +51,9 @@ class SvgCubicSpline extends Component {
         var maxX = this.spline.maxX;
         this.spline.formulate();
 
-        this.interpolate(minX, maxX);   // interpolate all points on curve
-        this.createKnots(minX, maxX);   // create svg knots elements
-        this.createLines(minX, maxX);   // create line segments
+        this.interpolate(minX, maxX);       // interpolate all points on curve
+        this.createKnots(minX, maxX);       // create svg knots elements
+        this.createPieceswise(minX, maxX);  // create piecewise segments
     }
 
     createKnots(minX, maxX)
@@ -92,7 +92,7 @@ class SvgCubicSpline extends Component {
         return rms;
     }
 
-    createLines(minX, maxX)
+    createPieceswise(minX, maxX)
     {
         // draw lines - can be optimized 
         var slope0 = null;
