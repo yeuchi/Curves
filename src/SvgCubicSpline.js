@@ -82,7 +82,7 @@ class SvgCubicSpline extends Component {
 
     createDot(x, y, radius)
     {
-        return (<circle id="point" cx={x} cy={y} r={radius} />);
+        return (<circle class="point" cx={x} cy={y} r={radius} />);
     }
 
     slopeRMS(slope0, slope1)
