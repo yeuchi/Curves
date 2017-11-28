@@ -95,38 +95,30 @@ class SvgCubicSpline extends Component {
     createPieceswise(minX, maxX)
     {
         // draw lines - can be optimized 
-        var slope0 = null;
-        var p0 = null;
+        var slope0 = (this.curveY[1]-this.curveY[0]);
+        var p0 = new Point(minX, this.curveY[0]);
         var p1 = null;
         this.lines2Draw = [];
-        var len = this.curveY.length-1;
-        for(var i=0; i<len; i++)
+        var len = this.curveY.length;
+        for(var i=1; i<len; i++)
         {
             // calculate slope
             var slope1 = (this.curveY[i+1]-this.curveY[i]);
-            p1 = new Point(i+minX, this.curveY[i]);
             
-            if(null===slope0)
+            // when slope changes
+            if(this.slopeRMS(slope0, slope1)>0.1)
             {
-                // new line
+                p1 = new Point(i+minX, this.curveY[i]);
+            
+                this.lines2Draw.push(this.createLine(p0, p1));
+                this.dots2Draw.push(this.createDot(p1.x, p1.y, 2));
+
                 p0 = p1;
                 slope0 = slope1;
             }
-            else
-            {
-                // when slope changes
-                if(this.slopeRMS(slope0, slope1)>0.1)
-                {
-                    this.lines2Draw.push(this.createLine(p0, p1));
-                    this.dots2Draw.push(this.createDot(p1.x, p1.y, 2));
-                    
-                    slope0 = null;
-                    p0 = null;
-                }
-            }
         }
         // last line segment
-        this.lines2Draw.push(this.createLine(p0, new Point(maxX, this.curveY[len])));
+        this.lines2Draw.push(this.createLine(p0, new Point(maxX, this.curveY[len-1])));
     }
 
     createLine(p0, p1)
