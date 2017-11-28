@@ -1,6 +1,6 @@
 ## Cubic spline interpolation
 
-This project upgrades the cubic spline implementation to ES6.  Additionally, it demonstrates a COMB functions alternative via piecewise length.  The ReactJS code-kata is composed of the following actions.
+This project upgrades the cubic spline implementation to ES6.  Additionally, it demonstrates a COMB functions alternative via linear-piecewise markers.  The ReactJS code-kata is composed of the following actions.
 * draw linear piecewise segements base on slope RMS tolerance on curve.
 * draw piecewise end points.
 * draw interpolation knot points.
