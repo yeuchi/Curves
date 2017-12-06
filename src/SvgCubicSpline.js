@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import Point from './Point';
+import Line from './Line';
+import COMB from './COMB';
 import CubicSpline from './CubicSpline';
 
 class SvgCubicSpline extends Component {
@@ -32,7 +34,9 @@ class SvgCubicSpline extends Component {
 
         var pos = new Point(e.clientX-this.svgBound.left, e.clientY-this.svgBound.top);
         this.spline.append(pos);
-        this.forceUpdate();
+
+        // re-render
+        this.setState({'nodes':'add'})
       }
 
     /*
@@ -54,6 +58,43 @@ class SvgCubicSpline extends Component {
         this.interpolate(minX, maxX);       // interpolate all points on curve
         this.createKnots(minX, maxX);       // create svg knots elements
         this.createPieceswise(minX, maxX);  // create piecewise segments
+        //this.createCOMB();
+    }
+
+   /*
+    * COMB
+    * http://www.aliasworkbench.com/theoryBuilders/TB5_evaluate1.htm
+    *
+    * 1. Curvature (height) = 1 / radius (a proportional value)
+    * 2. radius = intersection of 2 tangent lines
+    * 3. tangent line = tangent of a point on the spline curve.
+    * 4. point on spline curve = calculated or knot value.
+    */
+    createCMOB()
+    {
+        var comb = new COMB(this.knot2Draw);
+        comb.calculateOrthogonals();
+
+        this.normals2Draw = [];
+        this.curve2Draw = [];
+        var last = null;
+        for(var i=0; i<this.knots2Draw.length; i++)
+        {
+            // create SVG normal lines
+            var line = comb.getNormalByIndex(i);
+            this.normals2Draw.push(this.createLine( line.pointStart.x,
+                                                    line.pointStart.y,
+                                                    line.pointEnd.x,
+                                                    line.pointEnd.y));
+            last = line;
+
+            // draw COMB curve line
+            if(null!=last)
+                this.curve2Draw.push(this.createLine(last.pointEnd.x,
+                                                    last.pointEnd.y,
+                                                    line.pointEnd.x,
+                                                    line.pointEnd.y));
+        }
     }
 
     createKnots(minX, maxX)
@@ -147,6 +188,23 @@ class SvgCubicSpline extends Component {
         </g>);
     }
 
+    /*
+     * COMB function elements below
+     */
+    getCOMBNormals()
+    {
+        return (<g stroke="blue" strokeWidth="1">
+        {this.normals2Draw}
+        </g>);
+    }
+
+    getCOMBCurve()
+    {
+        return (<g stroke="blue" strokeWidth="1">
+        {this.curve2Draw}
+        </g>);
+    }
+
     render() {
         this.createElements();
         
@@ -155,6 +213,7 @@ class SvgCubicSpline extends Component {
             {this.getLines()}        
             {this.getLineDots()}
             {this.getCurveKnots()}
+            
         </svg>);
     }
 }
